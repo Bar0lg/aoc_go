@@ -4,124 +4,112 @@ import(
     "fmt"
     "strings"
     _ "embed"
-    "strconv"
 )
 
 //go:embed input.txt
 var InputDay string
 
-func to_int(t [][]string)[][]int{
-    var res [][]int = make([][]int, 0)
-    for i,v := range t{
-        res = append(res, make([]int, 0))
-        for _,s := range v{
-            var n1,_ = strconv.Atoi(s)
-            res[i] = append(res[i], n1)
+type coo_t struct{
+    X int
+    Y int
+}
+
+var R = coo_t{0,1}
+var L = coo_t{0,-1}
+var U = coo_t{-1,0}
+var D = coo_t{1,0}
+var UR = coo_t{-1,1}
+var UL = coo_t{-1,-1}
+var DR = coo_t{1,1}
+var DL = coo_t{1,-1}
+
+var dirs [8]coo_t = [8]coo_t{R,L,U,D,UR,UL,DR,DL}
+
+func apply_dir(coo coo_t,dir coo_t, max_line int,max_col int) coo_t{
+    if coo.X + dir.X >= max_line || coo.X + dir.X <0{
+        return coo_t{-1,-1}
+    }
+    if coo.Y + dir.Y >= max_col || coo.Y + dir.Y <0{
+        return coo_t{-1,-1}
+    }
+    return coo_t{coo.X+dir.X,coo.Y+dir.Y}
+}
+
+func parser()[][]string{
+    var lines []string = strings.Split(InputDay,"\n")
+    lines = lines[:len(lines)-1]
+    var res [][]string = make([][]string,0)
+    for _,v := range lines{
+        var letters []string = strings.Split(v,"")
+        res = append(res, letters)
+    }
+    return res
+}
+
+var WORD [4]string = [4]string{"X","M","A","S"}
+
+func go_catch(tab [][]string,word_index int,coo coo_t,dir coo_t) bool{
+    if (coo == coo_t{-1,-1}){
+        return false
+    }
+    if (word_index == 3 && tab[coo.X][coo.Y] == WORD[word_index]){
+        return true
+    }
+    if tab[coo.X][coo.Y] != WORD[word_index]{
+        return false
+    }
+    return go_catch(tab,word_index+1,apply_dir(coo,dir,len(tab),len(tab[0])),dir)
+
+}
+
+func part1(t [][]string)int{
+    var res int =0
+    for i := range t{
+        for j := range t[i]{
+            if t[i][j] != WORD[0]{
+                continue
+            }
+            for _,d := range dirs{
+                if go_catch(t,0,coo_t{i,j},d){
+                    res += 1
+                }   
+            }
         }
     }
     return res
 }
+var coo_oob coo_t = coo_t{-1,-1}
 
-func parser()([][]int,[][]int){
-    var cutted []string = strings.Split(InputDay,"\n\n")
-    var orderL  []string = strings.Split(cutted[0],"\n")
-    var presentPage []string = strings.Split(cutted[1],"\n")
-    presentPage = presentPage[:len(presentPage)-1]
-    var order_res [][]string = make([][]string, 0)
-    var pages_res [][]string = make([][]string, 0)
-    for _,v := range orderL{
-        order_res = append(order_res, strings.Split(v,"|"))
-    }
-    for _,v := range presentPage{
-        pages_res = append(pages_res, strings.Split(v,","))
-    }
-    return to_int(order_res),to_int(pages_res)
-}
-
-func in_tab(elem int,t []int)bool{
-    var res bool = false
-    for _,v := range t{
-        res = res || (v == elem)
-    }
-    return res
-}
-
-func part1()int{
-    var res int
-    pageOr,pagePre := parser()
-    for _,manual := range pagePre{
-        var seen []int = make([]int, 0)
-        var valid bool = true
-        for _,page := range manual{
-            for _,rule := range pageOr{
-                if rule[1] == page{
-                    if (in_tab(rule[0],manual) && !in_tab(rule[0],seen)){
-                        valid = false
-                    }
+func part2(t [][]string)int{
+    var res int =0
+    for i := range t{
+        for j := range t[i]{
+            if t[i][j] != "A"{
+                continue
+            }
+            var UL_coo coo_t = apply_dir(coo_t{i,j},UL,len(t),len(t[0]))
+            var UR_coo coo_t = apply_dir(coo_t{i,j},UR,len(t),len(t[0]))
+            var DL_coo coo_t = apply_dir(coo_t{i,j},DL,len(t),len(t[0]))
+            var DR_coo coo_t = apply_dir(coo_t{i,j},DR,len(t),len(t[0]))
+            if UL_coo == coo_oob || UR_coo == coo_oob || DL_coo == coo_oob || DR_coo == coo_oob{
+                continue
+            }
+            if (!(t[UL_coo.X][UL_coo.Y] == "M" && t[DR_coo.X][DR_coo.Y] == "S")){ 
+                if (!(t[UL_coo.X][UL_coo.Y] == "S" && t[DR_coo.X][DR_coo.Y] == "M")){
+                    continue
                 }
             }
-            seen = append(seen, page)
-        }
-        if valid{
-            res += manual[len(manual)/2]
-        }
-    }
-    return res
-}
-
-func repair(page_O [][]int,broken []int) []int{
-    var res []int = make([]int, 0)
-    var index int = 0
-    for len(res) != len(broken){
-        var valid bool = true
-        if !in_tab(broken[index],res){
-            for _,rule := range page_O{
-                if (rule[1] == broken[index]){
-                    if in_tab(rule[0],broken){
-                        if !in_tab(rule[0],res){
-                            valid = false
-                        }
-                    }
+            if (!(t[UR_coo.X][UR_coo.Y] == "M" && t[DL_coo.X][DL_coo.Y] == "S")){
+                if (!(t[UR_coo.X][UR_coo.Y] == "S" && t[DL_coo.X][DL_coo.Y] == "M")){
+                    continue
                 }
             }
-            if valid{
-                res = append(res, broken[index])
+            res += 1
+
             }
         }
-        index = (index +1) % len(broken)
-
-        
-    }
-    return res
-}
-
-func part2()int{
-    var res int
-    pageOr,pagePre := parser()
-    for _,manual := range pagePre{
-        var seen []int = make([]int, 0)
-        var invalid = false
-        for _,page := range manual{
-            for _,rule := range pageOr{
-                if rule[1] == page{
-                    if (in_tab(rule[0],manual) && !in_tab(rule[0],seen)){
-                        r := repair(pageOr,manual)
-                        res += r[len(r)/2]
-                        invalid = true
-                        break
-                    }
-                }
-            }
-            if invalid{
-                break
-            }
-            seen = append(seen, page)
-        }
-    }
     return res
 }
 func main(){
-    //x,y := parser()
-    //fmt.Println(repair(x,y[4]))
-    fmt.Println(part2())
+    fmt.Println(part2(parser()))
 }
