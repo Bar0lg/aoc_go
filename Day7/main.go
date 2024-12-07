@@ -42,7 +42,7 @@ func rec_resolver(before int, numbers []int, goal int)bool{
     if (len(numbers) == 0 && before == goal){
         return true
     }
-    if len(numbers) == 0{
+    if before > goal || len(numbers) == 0{
         return false
     }
     var res bool = false
@@ -54,7 +54,7 @@ func rec_resolver_part2(before int, numbers []int, goal int)bool{
     if (len(numbers) == 0 && before == goal){
         return true
     }
-    if len(numbers) == 0{
+    if before > goal || len(numbers) == 0{
         return false
     }
     var res bool = false
@@ -69,7 +69,7 @@ func rec_resolver_part2(before int, numbers []int, goal int)bool{
 func part1(results []int,nums [][]int)int{
     var res int
     for i := range(results){
-        if rec_resolver(0,nums[i],results[i]){
+        if rec_resolver(nums[i][0],nums[i][1:],results[i]){
             res += results[i]
         }
     }
@@ -78,7 +78,7 @@ func part1(results []int,nums [][]int)int{
 func part2(results []int,nums [][]int)int{
     var res int
     for i := range(results){
-        if rec_resolver_part2(0,nums[i],results[i]){
+        if rec_resolver_part2(nums[i][0],nums[i][1:],results[i]){
             res += results[i]
         }
     }
