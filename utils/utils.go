@@ -2,6 +2,7 @@ package utils
 
 import (
 	"strings"
+    "fmt"
 )
 
 func InToGrid(input string) [][]string {
@@ -19,4 +20,13 @@ func Abs(x int) int {
 		return -x
 	}
 	return x
+}
+
+func PrintGrid(g [][]string){
+    for _,v := range g{
+        for _,v2 := range v{
+            fmt.Printf("%s",v2)
+        }
+        fmt.Printf("\n")
+    }
 }

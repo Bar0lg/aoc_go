@@ -141,5 +141,5 @@ func part2(tab [][]string, start coo_t) int {
 
 func main() {
 	grid, start_pos := parser(inputDay)
-	fmt.Println(part1(grid, start_pos))
+	fmt.Println(part2(grid, start_pos))
 }
