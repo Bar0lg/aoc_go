@@ -86,9 +86,9 @@ func Part2(disk []int) int {
 				i++
 			}
 			first_empty = i
+            size_num := calc_size_block(disk, back_index)
 			for i < back_index {
 				size_empty := calc_size_empty(disk, i)
-				size_num := calc_size_block(disk, back_index)
 				if size_empty >= size_num {
 					for range size_num {
 						disk[i] = disk[back_index]
@@ -113,7 +113,6 @@ func Part2(disk []int) int {
 		}
 	}
 	return checks(disk)
-
 }
 func main() {
 	fmt.Println("PART2:", Part2(parser()))
