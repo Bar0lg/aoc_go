@@ -22,6 +22,7 @@ func Part2(){
 }
 
 func main(){
+    fmt.Println(parser())
     fmt.Println("PART1:",Part1(parser()))
     fmt.Println("PART 2:",Part2(parser()))
 }
