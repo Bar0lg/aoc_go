@@ -88,14 +88,15 @@ func rec_perimeter(grid [][]string, region string, coo coo_t, seen map[coo_t]Emp
 func Part1(grid [][]string) int {
 	res := 0
 	seen := make(map[coo_t]Empty)
-	seen_para := make(map[coo_t]Empty)
+	seen_peri := make(map[coo_t]Empty)
 
 	for i := range grid {
 		for j := range grid[i] {
-			area := rec_area(grid, grid[i][j], coo_t{i, j}, seen)
-			if area != 0 {
-				paramiter := rec_perimeter(grid, grid[i][j], coo_t{i, j}, seen_para)
-				res += area * paramiter
+            _,ok := seen[coo_t{i,j}]
+            if !ok{
+                area := rec_area(grid, grid[i][j], coo_t{i, j}, seen)
+				perimter := rec_perimeter(grid, grid[i][j], coo_t{i, j}, seen_peri)
+				res += area * perimter
 			}
 		}
 	}
@@ -170,14 +171,15 @@ func rec_sides(grid [][]string, region string, coo coo_t, seen map[coo_t]Empty) 
 func Part2(grid [][]string) int {
 	res := 0
 	seen := make(map[coo_t]Empty)
-	seen_para := make(map[coo_t]Empty)
+	seen_angles := make(map[coo_t]Empty)
 
 	for i := range grid {
 		for j := range grid[i] {
-			area := rec_area(grid, grid[i][j], coo_t{i, j}, seen)
-			if area != 0 {
-				sides := rec_sides(grid, grid[i][j], coo_t{i, j}, seen_para)
-				res += area * sides
+            _,ok := seen[coo_t{i,j}]
+            if !ok{
+                area := rec_area(grid, grid[i][j], coo_t{i, j}, seen)
+                sides := rec_sides(grid, grid[i][j], coo_t{i, j}, seen_angles)
+                res += area * sides
 			}
 		}
 	}
