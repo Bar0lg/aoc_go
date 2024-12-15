@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"strings"
@@ -30,3 +30,15 @@ func PrintGrid(g [][]string){
         fmt.Printf("\n")
     }
 }
+func copy_grid(g [][]string)[][]string{
+    res := make([][]string,0)
+    for _,vi := range g{
+        tmp := make([]string,0)
+        for _,vj := range vi{
+            tmp = append(tmp, vj)
+        }
+        res = append(res, tmp)
+    }
+    return res
+}
+
