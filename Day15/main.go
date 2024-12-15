@@ -176,17 +176,14 @@ func apply_dir(coo coo_t,dir int)coo_t{
     }
 }
 
-func push_v2(grid [][]string,coo coo_t,dir int)int{
+func check(grid [][]string,coo coo_t,dir int)bool{
     var next coo_t = apply_dir(coo,dir)
     
     if grid[next.x][next.y] == "#"{
-        return -1
+        return false
     }
     if grid[next.x][next.y] == "."{
-        tmp := grid[coo.x][coo.y]
-        grid[coo.x][coo.y] = grid[next.x][next.y]
-        grid[next.x][next.y] = tmp
-        return 0
+        return true
     }
     if grid[next.x][next.y] == "[" || grid[next.x][next.y] == "]"{
         other := coo_t{-1,-1}
@@ -196,39 +193,60 @@ func push_v2(grid [][]string,coo coo_t,dir int)int{
             other = apply_dir(next,LEFT)
         }
         if dir == UP || dir == DOWN{
-            s1 := push_v2(grid,next,dir)
-            s2 := push_v2(grid,other,dir)
-            if s1 == -1 && s2 == -1{
-                return -1
-            }
-            if s1 == -1{
-                return -1
-            }
-            if s2 == -1{
-                return -1
-            }
-            tmp := grid[coo.x][coo.y]
-            grid[coo.x][coo.y] = grid[next.x][next.y]
-            grid[next.x][next.y] = tmp
-            return 0
+            s1 := check(grid,next,dir)
+            s2 := check(grid,other,dir)
+                return s1 && s2
         }else{
             other = apply_dir(next,dir)
-            status := push_v2(grid,other,dir)
-            if status != -1{
-                grid[next.x][next.y],grid[other.x][other.y] = grid[other.x][other.y],grid[next.x][next.y]
-                grid[next.x][next.y],grid[coo.x][coo.y] = grid[coo.x][coo.y],grid[next.x][next.y]
-                return 0
-            }
-            return -1
+            return check(grid,other,dir)
         }
     }
     fmt.Println(coo,"GROS PROBLEME")
-    return -1
+    return false
+}
+func push_v2(grid [][]string,coo coo_t,dir int){
+    var next coo_t = apply_dir(coo,dir)
+    
+    if grid[next.x][next.y] == "#"{
+        fmt.Println("GROS probleme")
+        return
+    }
+    if grid[next.x][next.y] == "."{
+        tmp := grid[coo.x][coo.y]
+        grid[coo.x][coo.y] = grid[next.x][next.y]
+        grid[next.x][next.y] = tmp
+        return
+    }
+    if grid[next.x][next.y] == "[" || grid[next.x][next.y] == "]"{
+        other := coo_t{-1,-1}
+        if grid[next.x][next.y] == "["{
+            other = apply_dir(next,RIGHT)
+        }else{
+            other = apply_dir(next,LEFT)
+        }
+        if dir == UP || dir == DOWN{
+            push_v2(grid,next,dir)
+            push_v2(grid,other,dir)
+
+            tmp := grid[coo.x][coo.y]
+            grid[coo.x][coo.y] = grid[next.x][next.y]
+            grid[next.x][next.y] = tmp
+            return
+        }else{
+            other = apply_dir(next,dir)
+            push_v2(grid,other,dir)
+            grid[next.x][next.y],grid[other.x][other.y] = grid[other.x][other.y],grid[next.x][next.y]
+            grid[next.x][next.y],grid[coo.x][coo.y] = grid[coo.x][coo.y],grid[next.x][next.y]
+            return
+            }
+    }
+    fmt.Println(coo,"GROS PROBLEME")
+    return
 }
 
-func move_v2(grid [][]string,coo coo_t,moves []string)[][]string{
+func move_v2(grid [][]string,coo coo_t,moves []string){
     if len(moves) == 0{
-        return grid
+        return
     }
     //print_grid(grid)
     var next coo_t = coo_t{}
@@ -250,16 +268,17 @@ func move_v2(grid [][]string,coo coo_t,moves []string)[][]string{
         next = coo_t{-1,-1}
     }
     if grid[next.x][next.y] == "#"{
-        return move_v2(grid,coo,moves[1:])
+        move_v2(grid,coo,moves[1:])
+        return
     }
     if grid[next.x][next.y] == "."{
         tmp := grid[coo.x][coo.y]
         grid[coo.x][coo.y] = grid[next.x][next.y]
         grid[next.x][next.y] = tmp
-        return move_v2(grid,next,moves[1:])
+        move_v2(grid,next,moves[1:])
+        return
     }
     if grid[next.x][next.y] == "[" || grid[next.x][next.y] == "]"{
-        backup_grid := copy_grid(grid)
         other := coo_t{-1,-1}
         if grid[next.x][next.y] == "["{
             other = apply_dir(next,RIGHT)
@@ -267,26 +286,33 @@ func move_v2(grid [][]string,coo coo_t,moves []string)[][]string{
             other = apply_dir(next,LEFT)
         }
         if dir == UP || dir == DOWN{
-            s1 := push_v2(grid,next,dir)
-            s2 := push_v2(grid,other,dir)
-            if s1 == 0 && s2 == 0{
+            s1 := check(grid,next,dir)
+            s2 := check(grid,other,dir)
+            if s1 && s2{
+                push_v2(grid,next,dir)
+                push_v2(grid,other,dir)
                 grid[coo.x][coo.y],grid[next.x][next.y] = grid[next.x][next.y],grid[coo.x][coo.y]
-                return move_v2(grid,next,moves[1:])
+                move_v2(grid,next,moves[1:])
+                return
             }
-            return move_v2(backup_grid,coo,moves[1:])
+            move_v2(grid,coo,moves[1:])
+            return
         }else{
             other = apply_dir(next,dir)
-            status := push_v2(grid,other,dir)
-            if status != -1{
+            status := check(grid,other,dir)
+            if status{
+                push_v2(grid,other,dir)
                 grid[next.x][next.y],grid[other.x][other.y] = grid[other.x][other.y],grid[next.x][next.y]
                 grid[next.x][next.y],grid[coo.x][coo.y] = grid[coo.x][coo.y],grid[next.x][next.y]
-                return move_v2(grid,next,moves[1:])
+                move_v2(grid,next,moves[1:])
+                return
             }
-            return move_v2(backup_grid,coo,moves[1:])
+            move_v2(grid,coo,moves[1:])
+            return
         }
     }
     fmt.Println(coo,"GROS PROBLEME")
-    return make([][]string,0)
+    return
 }
 
 func grid_p2(g [][]string)[][]string{
@@ -336,7 +362,7 @@ func Part2(grid [][]string,moves []string)int{
             }
         }
     }
-    grid = move_v2(grid,char_pos,moves)
+    move_v2(grid,char_pos,moves)
     res := 0
     for i := range grid{
         for j := range grid[i]{
