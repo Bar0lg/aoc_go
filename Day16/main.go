@@ -157,12 +157,10 @@ func Part1(g *graph_t)int{
 
 }
 
-var dest_perm map[*graph_t]int = make(map[*graph_t]int)
 var prevs map[*graph_t]([]*graph_t) = make(map[*graph_t][]*graph_t)
 
 func parcours_v2(node *graph_t,dst_from_center int,dists map[*graph_t]int,seen map[*graph_t]bool)*graph_t{
     //fmt.Println(node.coo_t,node.cost,dst_from_center)
-    dest_perm[node] = dst_from_center
     delete (dists,node)
     if node.coo_t == GOAL.coo_t{
         return node
@@ -177,7 +175,7 @@ func parcours_v2(node *graph_t,dst_from_center int,dists map[*graph_t]int,seen m
             dists[nei] = dst_from_center+ nei.cost
             prevs[nei] = append(prevs[nei], node)
         }else{
-            if dst_from_center+nei.cost <= dists[nei]{
+            if dst_from_center+nei.cost == dists[nei]{
                 prevs[nei] = append(prevs[nei], node)
             }
             dists[nei] = min(dists[nei],dst_from_center+nei.cost)
