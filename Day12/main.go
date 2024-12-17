@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-//go:embed input.txt
+//go:embed test.txt
 var inputDay string
 
 func InToGrid(input string) [][]string {
