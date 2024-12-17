@@ -30,7 +30,8 @@ func parser()VM_t{
     fmt.Sscanf(regs_split[1],"Register B: %d",&regb)
     fmt.Sscanf(regs_split[2],"Register C: %d",&regc)
     code := reg_and_code[1]
-    code_splitted := strings.Split(code,",")
+    code_splitted := strings.Split(strings.TrimPrefix(code,"Program: "),",")
+    fmt.Println(code_splitted)
     code_int := make([]uint64,0)
     for _,v := range code_splitted{
         n1,_ := strconv.Atoi(v)
@@ -133,8 +134,6 @@ func run(vm *VM_t){
     }
     code := vm.Programm[vm.PC]
     opperand := vm.Programm[vm.PC+1]
-    //fmt.Println(code,vm.Reg_A,opperand)
-    //fmt.Scanln()
     switch code{
     case ADV:
         adv(vm,vm.Reg_A,exp(2,combo(vm,opperand),vm.Reg_A))
