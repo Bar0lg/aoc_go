@@ -160,7 +160,7 @@ func run(vm *VM_t){
 
 func Part1(vm VM_t){
     run(&vm)
-    fmt.Printf("\n")
+    fmt.Println("Part1: ",vm.outupt)
     return
 }
 
