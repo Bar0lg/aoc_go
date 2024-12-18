@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//go:embed test.txt
+//go:embed input.txt
 var inputDay string
 
 func parser()*graph_t{
@@ -39,8 +39,8 @@ const (
     DOWN = 1
     LEFT = 2
     UP = 3
-    MAX_Y = 7
-    MAX_X = 7
+    MAX_Y = 71
+    MAX_X = 71
 )
 
 type graph_t struct{
@@ -142,41 +142,30 @@ func Part1(g *graph_t)int{
 
 
 }
-func parcoursv2(node *graph_t,dst_from_center int,dists map[*graph_t]int,seen map[*graph_t]bool)bool{
+func parcoursv2(grid [][]string,coo coo_t,seen map[coo_t]bool)bool{
     //fmt.Println(node.coo_t,node.cost,dst_from_center)
-    delete (dists,node)
-    if (node.coo_t == coo_t{MAX_X-1,MAX_Y-1}){
-        return true
-    }
-    seen[node] = true
-    for _,nei := range node.nei{
-        if seen[nei]{
-            continue
-        }
-        _,ok := dists[nei]
-        if !ok{
-            dists[nei] = dst_from_center+ nei.cost
-        }else{
-            dists[nei] = min(dists[nei],dst_from_center+nei.cost)
-        }
-    }
-    min_dst := -1
-    var min_nei *graph_t = nil
-    for key,val := range dists{
-        if min_dst == -1{
-            min_nei = key
-            min_dst = val
-        }
-        if min_dst > val{
-            min_dst = val
-            min_nei = key
-        }
-    }
-    if min_nei == nil{
+    if seen[coo]{
         return false
     }
-    //fmt.Println("MIN:",min_nei)
-    return parcoursv2(min_nei,dists[min_nei],dists,seen)
+    if coo.x < 0 || coo.x >= MAX_X{
+        return false
+    }
+    if coo.y < 0 || coo.y >= MAX_Y{
+        return false
+    }
+    if grid[coo.x][coo.y] == "#"{
+        return false
+    }
+    if (coo == coo_t{MAX_X-1,MAX_Y-1}){
+        return true
+    }
+    seen[coo] = true
+    res := false
+    for i := range 4{
+        new_coo := apply_dir(coo,i)
+        res = res || parcoursv2(grid,new_coo,seen)
+    }
+    return res
 }
 
 func Part2(){
@@ -188,18 +177,14 @@ func Part2(){
         }
         grid = append(grid, tmp)
     }
-    var gra *graph_t = nil
     corr := strings.Split(strings.TrimSuffix(inputDay,"\n"),"\n")
     for i := range corr{
         corr_coo := strings.Split(corr[i],",")
         n1,_ := strconv.Atoi(corr_coo[0])
         n2,_ := strconv.Atoi(corr_coo[1])
         grid[n2][n1] = "#"
-        gra = rec_create_graph(grid,coo_t{0,0},0,make(map[coo_t]*graph_t))
-        dists := make(map[*graph_t]int)
-        dists[gra] = 0
-        if !parcoursv2(gra,0,dists,make(map[*graph_t]bool)){
-            fmt.Println(n1,n2)
+        if !parcoursv2(grid,coo_t{0,0},make(map[coo_t]bool)){
+            fmt.Printf("PART2:%d,%d\n",n1,n2)
             return
         }
     }
@@ -209,6 +194,6 @@ func Part2(){
 }
 
 func main(){
-    //fmt.Println("PART1:",Part1(parser()))
+    fmt.Println("PART1:",Part1(parser()))
     Part2()
 }
