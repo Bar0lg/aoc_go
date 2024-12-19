@@ -52,7 +52,7 @@ const (
 )
 
 func adv(vm *VM_t,num int,denum int){
-    vm.Reg_A = num/denum
+    vm.Reg_A = num >> denum
     vm.PC += 2
 }
 func bxl(vm *VM_t,num1 int,num2 int){
@@ -80,30 +80,13 @@ func out(vm *VM_t,num int){
     vm.PC += 2
 }
 func bdv(vm *VM_t,num int,denum int){
-    vm.Reg_B =  num/denum
+    vm.Reg_B =  num >> denum
     vm.PC += 2
 
 }
 func cdv(vm *VM_t,num int,denum int){
-    vm.Reg_C = num/denum
+    vm.Reg_C = num >> denum
     vm.PC += 2
-}
-func exp(x int,n int,max_i int)int{
-    if n == 0{
-        return 1
-    }
-    if n %2 == 0{
-        tmp := exp(x,n/2,max_i)
-        if tmp >= max_i{
-            return max_i +1
-        }
-        return tmp*tmp
-    }
-    tmp := exp(x,(n-1)/2,max_i)
-    if tmp >= max_i{
-        return max_i + 1
-    }
-    return x * tmp*tmp
 }
 
 func combo(vm *VM_t,ope int)int{
@@ -137,7 +120,7 @@ func run(vm *VM_t){
     opperand := vm.Programm[vm.PC+1]
     switch code{
     case ADV:
-        adv(vm,vm.Reg_A,exp(2,combo(vm,opperand),vm.Reg_A))
+        adv(vm,vm.Reg_A,combo(vm,opperand))
     case BXL:
         bxl(vm,vm.Reg_B,opperand)
     case BST:
@@ -149,9 +132,9 @@ func run(vm *VM_t){
     case OUT:
         out(vm,combo(vm,opperand))
     case BDV:
-        bdv(vm,vm.Reg_A,exp(2,combo(vm,opperand),vm.Reg_A))
+        bdv(vm,vm.Reg_A,combo(vm,opperand))
     case CDV:
-        cdv(vm,vm.Reg_A,exp(2,combo(vm,opperand),vm.Reg_A))
+        cdv(vm,vm.Reg_A,combo(vm,opperand))
     default:
         fmt.Println("ERROR")
     }
