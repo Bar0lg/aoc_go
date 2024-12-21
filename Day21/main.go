@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//go:embed test.txt
+//go:embed input.txt
 var inputDay string
 
 type seq []rune
@@ -265,7 +265,7 @@ func Part2(codes []seq,iter int)int{
             tests_chunks[i] = make(map_chunks)
             tests_chunks[i][seq_to_str(all_tests[i])] = 1
         }
-        fmt.Println(tests_chunks)
+        //fmt.Println(tests_chunks)
         for range iter{
             for i := range tests_chunks{
                 tests_chunks[i] = pad_to_padv3(tests_chunks[i])
@@ -292,7 +292,5 @@ func main(){
     //fmt.Println(num_code(parser()[0]))
     //fmt.Println("Old PART1",Part1(parser()))
     //fmt.Println("PART1:",Part1_bis(parser()))
-    for i := range 1{
-        fmt.Println("Boucle ",i+1,":",Part2(parser(),2))
-    }
+    fmt.Println("Part2:",Part2(parser(),20))
 }

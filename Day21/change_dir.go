@@ -199,7 +199,7 @@ func dir_to_dir(beg rune,end rune)seq{
             case '>':
                 return seq{'v','A'}
             case 'v':
-                return seq{'v','<','A'}
+                return seq{'<','v','A'}
             case '<':
                 return seq{'v','<','<','A'}
         }
