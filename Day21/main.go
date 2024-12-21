@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//go:embed input.txt
+//go:embed test.txt
 var inputDay string
 
 type seq []rune
@@ -27,7 +27,7 @@ func parser()[]seq{
 }
 
 const ERROR = 'Z'
-var ALL_DIRS []rune = []rune{'<','^','>','v'}
+var ALL_DIRS []rune = []rune{'v','^','>','<'}
 
 func is_in(l []rune,e rune)bool{
     for _,v := range l{
@@ -145,7 +145,6 @@ func pad_to_padv2(to_do seq,start rune,seen map[string]seq)seq{
     if seen[str] != nil{
         return seen[str]
     }
-    //print_all_seqs(res)
     res := dir_to_dir(start,to_do[0])
     next := pad_to_padv2(to_do[1:],to_do[0],seen)
     res = append(res, next...)
@@ -194,6 +193,12 @@ func Part1(codes []seq)int{
         for _,v := range all_seqs{
             new_all_seqs = append(new_all_seqs, pad_to_pad(v,'A',Apply_dir_dir,make(map[string][]seq))...)
         }
+        all_seqs = new_all_seqs
+        new_all_seqs = make([]seq, 0)
+
+        for _,v := range all_seqs{
+            new_all_seqs = append(new_all_seqs, pad_to_pad(v,'A',Apply_dir_dir,make(map[string][]seq))...)
+        }
         min_len := len(new_all_seqs[0])
         for _,v := range new_all_seqs{
             min_len = min(min_len,len(v))
@@ -205,7 +210,78 @@ func Part1(codes []seq)int{
     
 }
 
+func Part1_bis(codes []seq)int{
+    res := 0
+    for _,code := range codes{
+        all_tests := pad_to_pad(code,'A',Apply_dir_numpad,make(map[string][]seq))
+        //print_all_seqs(all_tests)
+        for range 3{
+            for i := range all_tests{
+                all_tests[i] = pad_to_padv2(all_tests[i],'A',make(map[string]seq))
+            } 
+        }
+        //print_all_seqs(all_tests)
+        best := trim_largest(all_tests)[0]
+        res += len(best)*num_code(code)
 
+    }
+    return res
+}
+
+func chunk_pass(start rune,chunk string,dico map_chunks,n int){
+    if chunk == ""{
+        return
+    }
+    new_chunk := seq_to_str(dir_to_dir(start,rune(chunk[0])))
+    dico[new_chunk] += n
+    chunk_pass(rune(chunk[0]),chunk[1:],dico,n)
+}
+
+type map_chunks map[string]int
+
+func pad_to_padv3(seq_chunks map_chunks)map_chunks{
+    res := make(map[string]int)
+    for key,val := range seq_chunks{
+        chunk_pass('A',key,res,val)
+    }
+    return res
+}
+func complex_level(d map_chunks)int{
+    res := 0
+    for key,val := range d{
+        res += len(key)*val
+    }
+    return res
+}
+
+
+func Part2(codes []seq,iter int)int{
+    res := 0
+    for _,code := range codes{
+        all_tests := pad_to_pad(code,'A',Apply_dir_numpad,make(map[string][]seq))
+        //print_all_seqs(all_tests)
+        tests_chunks := make([]map_chunks,len(all_tests))
+        for i := range all_tests{
+            tests_chunks[i] = make(map_chunks)
+            tests_chunks[i][seq_to_str(all_tests[i])] = 1
+        }
+        fmt.Println(tests_chunks)
+        for range iter{
+            for i := range tests_chunks{
+                tests_chunks[i] = pad_to_padv3(tests_chunks[i])
+            } 
+            //fmt.Println(tests_chunks[0])
+        }
+        tmp := complex_level(tests_chunks[0]) * num_code(code)
+        for _,v := range tests_chunks{
+            tmp = min(tmp,complex_level(v) * num_code(code))
+        }
+        //print_all_seqs(all_tests)
+        res += tmp
+
+    }
+    return res
+}
 
 
 //func Part2(){
@@ -214,6 +290,9 @@ func Part1(codes []seq)int{
 
 func main(){
     //fmt.Println(num_code(parser()[0]))
-    fmt.Println("PART1:",Part1(parser()))
-    //fmt.Println("PART 2:",Part2(parser()))
+    //fmt.Println("Old PART1",Part1(parser()))
+    //fmt.Println("PART1:",Part1_bis(parser()))
+    for i := range 1{
+        fmt.Println("Boucle ",i+1,":",Part2(parser(),2))
+    }
 }

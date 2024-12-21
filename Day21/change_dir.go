@@ -201,7 +201,7 @@ func dir_to_dir(beg rune,end rune)seq{
             case 'v':
                 return seq{'v','<','A'}
             case '<':
-                return seq{'v','<','v','A'}
+                return seq{'v','<','<','A'}
         }
     }
     case '^':{
@@ -235,7 +235,7 @@ func dir_to_dir(beg rune,end rune)seq{
     case 'v':{
         switch end{
             case 'A':
-                return seq{'>','^'}
+                return seq{'>','^','A'}
             case '^':
                 return seq{'^','A'}
             case '>':
