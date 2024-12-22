@@ -7,7 +7,7 @@ import (
     _ "embed"
 )
 
-//go:embed test.txt
+//go:embed input.txt
 var inputDay string
 
 func parser()[]int{
@@ -42,58 +42,78 @@ func Part1(init []int)uint64{
             v_64 = passage(v_64)
         }
         res += v_64
-        fmt.Println(v,v_64)
     }
     return res
 }
 
+func add_elem(l [4]int,e int)[4]int{
+    res := [4]int{}
+    res[0] = l[1]
+    res[1] = l[2]
+    res[2] = l[3]
+    res[3] = e
+    return res
+}
+
+func rand_to_banana_sold(rand []int){
+    for i := range rand{
+        rand[i] = rand[i] % 10
+    }
+}
+
+func all_byers_conv(byers [][]int){
+    for i := range byers{
+        rand_to_banana_sold(byers[i])
+    }
+}
+
 func Part2(init []int)int{
     var res int = 0
-    var true_res int= 0
     byers := make([][]int,0)
     for i,v := range init{
         byers = append(byers, make([]int, 0))
         byers[i] = append(byers[i], v)
-        for k :=  range 2000{
+        for k :=  range 1999{
                 byers[i] = append(byers[i], int(passage(uint64(byers[i][k]))))
         }
     }
 
-    for i:=-9;i<10;i++{
-        for j:=-9;j<10;j++{
-            for k:=-9;j<10;k++{
-                for l:=-9;l<10;l++{
-                    for _,by := range(byers){
-                        changes := [4]int{}
-                        changes[0] = by[1] - by[0]
-                        changes[1] = by[2] - by[1]
-                        changes[2] = by[3] - by[2]
-                        changes[3] = by[4] - by[3]
-                        for p:=4;p<len(by)-1;p++{
-                            if i == changes[0] && j == changes[1] && k == changes[2] && l == changes[3]{
-                                fmt.Println("PROC:",i)
-                                res += by[p] % 10
-                                break
-                            }
-                            changes[0] = changes[1]
-                            changes[1] = changes[2]
-                            changes[2] = changes[3]
-                            changes[3] = by[p+1] - by[p]
-                        }
-                    }
-                    true_res = max(true_res,res)
-                    res = 0
-
-                }
+    all_byers_conv(byers)
+    //fmt.Println(byers)
+    all_byers_deals := make([]map[[4]int]int,0)
+    for _,prices := range byers{
+        deals := make(map[[4]int]int)
+        changes := [4]int{}
+        changes = add_elem(changes,prices[1] - prices[0])
+        changes = add_elem(changes,prices[2] - prices[1])
+        changes = add_elem(changes,prices[3] - prices[2])
+        changes = add_elem(changes,prices[4] - prices[3])
+        deals[changes] = prices[4]
+        for p := 5;p<len(prices);p++{
+            changes = add_elem(changes,prices[p] - prices[p-1])
+            _,ok := deals[changes]
+            if !ok{
+                deals[changes] = prices[p]
             }
         }
+        all_byers_deals = append(all_byers_deals, deals)
+        
     }
-    return true_res
+    all_deal_concat := make(map[[4]int]int)
+    for _,byer := range all_byers_deals{
+        for key,val := range byer{
+            all_deal_concat[key] += val
+        }
+    }
+    for _,val := range all_deal_concat{
+        res = max(res,val)
 
+    }
+    return res
 }
 
 func main(){
     //fmt.Println(parser())
-    //fmt.Println("PART1:",Part1(parser()))
+    fmt.Println("PART1:",Part1(parser()))
     fmt.Println("PART 2:",Part2(parser()))
 }
