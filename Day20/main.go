@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-//go:embed test.txt
+//go:embed input.txt
 var inputDay string
 
 func parser()[][]string{
@@ -19,6 +19,7 @@ const (
     DOWN = 1
     LEFT = 2
     UP = 3
+    LIMIT = 100
 )
 
 type coo_t struct{
@@ -42,7 +43,8 @@ func apply_dir(coo coo_t,dir int)coo_t{
 
 
 func parcours_base(grid [][]string,dfb int,coo coo_t,dists map[coo_t]int){
-    if dists[coo] != 0{
+    _,ok := dists[coo]
+    if ok{
         return
     }
     if grid[coo.x][coo.y] == "#"{
@@ -61,7 +63,7 @@ func parcours_base(grid [][]string,dfb int,coo coo_t,dists map[coo_t]int){
 
 func parcours_cheat(g [][]string,dists map[coo_t]int)map[int]int{
     cheat := make(map[int]int)
-    for key,_ := range dists{
+    for key := range dists{
         for dir := range 4{
             next := apply_dir(key,dir)
             if g[next.x][next.y] != "#"{
@@ -73,7 +75,7 @@ func parcours_cheat(g [][]string,dists map[coo_t]int)map[int]int{
                 continue
             }
             if dists[new_coo] > dists[key]{
-                cheat[dists[new_coo] - dists[key]]++
+                cheat[dists[new_coo] - dists[key]-2]++
             }
         }
     }
@@ -89,16 +91,83 @@ func Part1(g [][]string)int{
             }
         }
     }
+    //PrintGrid(g)
     dists := make(map[coo_t]int)
     parcours_base(g,0,beg,dists)
-    fmt.Println(parcours_cheat(g,dists))
+    all_chats := parcours_cheat(g,dists)
+    res := 0
+    for key,val := range all_chats{
+        if key >= LIMIT{
+            res += val
+        }
 
-    return 0
+    }
+
+    return res
+
+
+}
+func abs(x int)int{
+    if x<0{
+        return -x
+    }
+    return x
+}
+
+func parcours_cheat2(dists map[coo_t]int)map[int]int{
+    cheat := make(map[int]int)
+    for key := range dists{
+        for d_x := -20;d_x<21;d_x++{
+            for d_y := -20;d_y<21;d_y++{
+                dist_man := abs(d_y) + abs(d_x)
+                if dist_man > 21{
+                    continue
+                }
+                new_coo := coo_t{key.x + (d_x),key.y + (d_y)}
+                _,ok := dists[new_coo]
+                if !ok{
+                    continue
+                }
+                if dists[new_coo] > dists[key]{
+                    //fmt.Println(key,new_coo,d_x,d_y,dist_man)
+                    //fmt.Println(dists[new_coo] - dists[key]-dist_man)
+                    //fmt.Println(key,new_coo)
+                    cheat[dists[new_coo] - dists[key]-dist_man]++
+                }
+            }
+    }
+    }
+    return cheat
+}
+
+func Part2(g [][]string)int{
+    beg := coo_t{}
+    for i := range g{
+        for j := range g[0]{
+            if g[i][j] == "S"{
+                beg = coo_t{i,j}
+            }
+        }
+    }
+    //PrintGrid(g)
+    dists := make(map[coo_t]int)
+    parcours_base(g,0,beg,dists)
+    all_chats := parcours_cheat2(dists)
+    res := 0
+    for key,val := range all_chats{
+        if key >= LIMIT{
+            res += val
+        }
+
+    }
+    //fmt.Println(all_chats)
+
+    return res
 
 
 }
 
 func main(){
-    fmt.Println("PART1:",Part1(parser()))
-    //Part2()
+    fmt.Println("PART 1:",Part1(parser()))
+    fmt.Println("PART 2:",Part2(parser()))
 }

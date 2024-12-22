@@ -6,7 +6,8 @@ import (
 )
 
 func InToGrid(input string) [][]string {
-	var l []string = strings.Split(strings.TrimSuffix(inputDay,"\n"), "\n")
+	var l []string = strings.Split(input, "\n")
+	l = l[:len(l)-1]
 	var res [][]string = make([][]string, 0)
 	for _, v := range l {
 		res = append(res, strings.Split(v, ""))
