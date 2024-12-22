@@ -291,6 +291,6 @@ func Part2(codes []seq,iter int)int{
 func main(){
     //fmt.Println(num_code(parser()[0]))
     //fmt.Println("Old PART1",Part1(parser()))
-    //fmt.Println("PART1:",Part1_bis(parser()))
-    fmt.Println("Part2:",Part2(parser(),20))
+    fmt.Println("PART1:",Part1_bis(parser()))
+    fmt.Println("Part2:",Part2(parser(),25))
 }

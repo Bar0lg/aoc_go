@@ -235,7 +235,7 @@ func dir_to_dir(beg rune,end rune)seq{
     case 'v':{
         switch end{
             case 'A':
-                return seq{'>','^','A'}
+                return seq{'^','>','A'}
             case '^':
                 return seq{'^','A'}
             case '>':
