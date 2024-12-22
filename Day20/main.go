@@ -114,36 +114,28 @@ func abs(x int)int{
     return x
 }
 
-func parcours_cheat2(g [][]string,dists map[coo_t]int)map[int]int{
-    seen := make(map[[2]coo_t]bool)
+func parcours_cheat2(dists map[coo_t]int)map[int]int{
     cheat := make(map[int]int)
     for key := range dists{
-            for d_x := -20;d_x<21;d_x++{
-                for d_y := -20;d_y<21;d_y++{
-                    dist_man := abs(d_y) + abs(d_x)
-                    if dist_man > 20{
-                        continue
-                    }
-                    new_coo := coo_t{key.x + (d_x),key.y + (d_y)}
-
-                    _,ok := dists[new_coo]
-                    if !ok{
-                        continue
-                    }
-                    if seen[[2]coo_t{key,new_coo}]{
-                        continue
-                    }
-                    seen[[2]coo_t{key,new_coo}] = true
-                    if dists[new_coo] > dists[key] + dist_man+1{
-                        //fmt.Println(key,new_coo,d_x,d_y,dist_man)
-                        //fmt.Println(dists[new_coo] - dists[key]-dist_man)
-                        //fmt.Println(key,new_coo)
-                        if dists[new_coo] - dists[key]-dist_man-1 == 76{
-                        }
-                        cheat[dists[new_coo] - dists[key]-dist_man]++
-                    }
+        for d_x := -20;d_x<21;d_x++{
+            for d_y := -20;d_y<21;d_y++{
+                dist_man := abs(d_y) + abs(d_x)
+                if dist_man > 20{
+                    continue
                 }
-        }
+                new_coo := coo_t{key.x + (d_x),key.y + (d_y)}
+                _,ok := dists[new_coo]
+                if !ok{
+                    continue
+                }
+                if dists[new_coo] > dists[key]{
+                    //fmt.Println(key,new_coo,d_x,d_y,dist_man)
+                    //fmt.Println(dists[new_coo] - dists[key]-dist_man)
+                    //fmt.Println(key,new_coo)
+                    cheat[dists[new_coo] - dists[key]-dist_man]++
+                }
+            }
+    }
     }
     return cheat
 }
@@ -160,7 +152,7 @@ func Part2(g [][]string)int{
     //PrintGrid(g)
     dists := make(map[coo_t]int)
     parcours_base(g,0,beg,dists)
-    all_chats := parcours_cheat2(g,dists)
+    all_chats := parcours_cheat2(dists)
     res := 0
     for key,val := range all_chats{
         if key >= LIMIT{
@@ -168,7 +160,7 @@ func Part2(g [][]string)int{
         }
 
     }
-    fmt.Println(all_chats)
+    //fmt.Println(all_chats)
 
     return res
 
