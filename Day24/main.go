@@ -1,10 +1,10 @@
 package main
 
 import (
-    "fmt"
-    "strconv"
-    "strings"
-    _ "embed"
+	_ "embed"
+	"fmt"
+	"strconv"
+	"strings"
 )
 
 //go:embed input.txt
@@ -106,12 +106,33 @@ func Part1(conn conn_t,init init_t)int{
 }
 
 
-func Part2(){
-    return
+func Part2(conn conn_t,init init_t){
+    for i := range 45{
+        new_z := ""
+        if i+1 < 10{
+            new_z = "z0" + strconv.Itoa(i+1)
+
+        }else{
+            new_z = "z"+strconv.Itoa(i+1)
+        }
+        for key := range init{
+            init[key] = 0
+            if key == "x" + strconv.Itoa(i) || key == "x0"+ strconv.Itoa(i){
+                init[key] = 1
+        }
+            if key == "y" + strconv.Itoa(i) || key == "y0"+ strconv.Itoa(i){
+                init[key] = 1
+        }
+        }
+        if parcours(conn,init,new_z,make(map[string]int)) != 1{
+            fmt.Println("ERROR AT",i)
+        }
+    
+}
 }
 
 func main(){
-    fmt.Println(parser())
+    //fmt.Println(parser())
     fmt.Println("PART1:",Part1(parser()))
-    //fmt.Println("PART 2:",Part2(parser()))
+    Part2(parser())
 }
