@@ -2,7 +2,15 @@ package main
 
 	import(
 	"fmt"
+	_ "embed"
 )
+
+//go:embed test.txt
+var inputDay string
+
+func parser(){
+
+}
 
 func part1()int{
 	return 0
