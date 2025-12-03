@@ -3,6 +3,8 @@ package main
 	import(
 	"fmt"
 	_ "embed"
+	//"slices"
+	"strings"
 )
 
 //go:embed test.txt
@@ -21,6 +23,7 @@ func part2()int{
 }
 
 func main(){
+	fmt.Println(parser())
 	fmt.Println("Part1:",part1())
 	fmt.Println("Part2:",part2())
 }
