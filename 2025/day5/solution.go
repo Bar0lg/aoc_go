@@ -112,6 +112,6 @@ func part2(all_ranges [][]int) int {
 
 func main() {
 	p1, p2 := parser()
-	fmt.Println("Part1:", part1(p1, p2))
-	fmt.Println("Part2:", part2(p1))
+	fmt.Println(part1(p1, p2))
+	fmt.Println(part2(p1))
 }
