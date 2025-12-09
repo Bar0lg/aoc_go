@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-//go:embed input.txt
+//go:embed test.txt
 var inputDay string
 
 type pos_t struct {
@@ -74,31 +74,39 @@ func what_move(p1 pos_t, p2 pos_t) int {
 	return UP
 }
 
-func can_be_done(list []pos_t, p1 int, p2 int, last_m int, broke bool) bool {
-	if p1 == len(list) {
-		p1 = 0
+func give_up(list []pos_t, p1 pos_t, p2 pos_t) bool {
+	lu := pos_t{min(p1.x, p2.x) - 1, min(p1.y, p2.y) - 1}
+	ru := pos_t{min(p1.x, p2.x) - 1, max(p1.y, p2.y) + 1}
+	rd := pos_t{max(p1.x, p2.x) + 1, max(p1.y, p2.y) + 1}
+	for i := range list[:len(list)-1] {
+		p1 := list[i]
+		p2 := list[i+1]
+		if p1.x == p2.x { // Cas vhorizon
+			if p1.x > lu.x && p1.x < rd.x {
+				if p1.y > lu.y && p1.y < ru.y && (p2.y <= lu.y || p2.y >= ru.y) {
+					return false
+				}
+				if p2.y > lu.y && p2.y < ru.y && (p1.y <= lu.y || p1.y >= ru.y) {
+					return false
+				}
+			}
+
+		}
+		if p1.y == p2.y { // Cas vertical
+			if p1.y > lu.y && p1.y < ru.y {
+				if p1.x > lu.x && p1.x < rd.x && (p2.x <= lu.x || p2.x >= rd.x) {
+					return false
+				}
+				if p2.x > lu.x && p2.x < rd.x && (p1.x <= lu.x || p1.x >= rd.x) {
+					return false
+				}
+			}
+
+		}
 	}
-	if p2 == p1 {
-		return true
-	}
-	pint := p1 + 1
-	if pint == len(list) {
-		pint = 0
-	}
-	m := what_move(list[p1], list[pint])
-	if broke && (last_m == UP || last_m == DOWN) && (m == LEFT || m == RIGHT) {
-		return false
-	}
-	if broke && (last_m == LEFT || last_m == RIGHT) && (m == UP || m == DOWN) {
-		return false
-	}
-	if (last_m == LEFT || last_m == RIGHT) && (m == UP || m == DOWN) {
-		return can_be_done(list, p1+1, p2, m, true)
-	}
-	if (last_m == UP || last_m == DOWN) && (m == LEFT || m == RIGHT) {
-		return can_be_done(list, p1+1, p2, m, true)
-	}
-	return can_be_done(list, p1+1, p2, m, broke)
+
+	return true
+
 }
 
 func is_green(list []pos_t, p pos_t) bool {
@@ -118,16 +126,38 @@ func is_green(list []pos_t, p pos_t) bool {
 			}
 		}
 		if p1.x == p2.x && p1.x < p.x {
-			if (p1.y <= p.y && p2.y >= p.y) || (p2.y <= p.y && p1.y >= p.y) {
+			if (p1.y <= p.y && p2.y > p.y) || (p2.y <= p.y && p1.y > p.y) {
 				up++
 			}
 		}
 		if p1.y == p2.y && p1.y < p.y {
-			if (p1.x <= p.x && p2.x >= p.x) || (p2.x <= p.x && p1.x >= p.x) {
+			if (p1.x <= p.x && p2.x > p.x) || (p2.x <= p.x && p1.x > p.x) {
 				side++
 			}
 		}
 
+	}
+	p1 := list[0]
+	p2 := list[len(list)-1]
+	if p1.x == p2.x && p1.x == p.x {
+		if (p1.y <= p.y && p2.y >= p.y) || (p2.y <= p.y && p1.y >= p.y) {
+			return true
+		}
+	}
+	if p1.y == p2.y && p1.y == p.y {
+		if (p1.x <= p.x && p2.x >= p.x) || (p2.x <= p.x && p1.x >= p.x) {
+			return true
+		}
+	}
+	if p1.x == p2.x && p1.x < p.x {
+		if (p1.y <= p.y && p2.y > p.y) || (p2.y <= p.y && p1.y > p.y) {
+			up++
+		}
+	}
+	if p1.y == p2.y && p1.y < p.y {
+		if (p1.x <= p.x && p2.x > p.x) || (p2.x <= p.x && p1.x > p.x) {
+			side++
+		}
 	}
 	if side%2 == 1 && up%2 == 1 {
 		return true
@@ -142,15 +172,7 @@ func part2(poss []pos_t) int {
 			if i1 == i2 {
 				continue
 			}
-			can := true
-			for xi := min(v1.x, v2.x); xi <= max(v1.x, v2.x); xi++ {
-				can = can && is_green(poss, pos_t{xi, v1.y})
-				can = can && is_green(poss, pos_t{xi, v2.y})
-			}
-			for yi := min(v1.y, v2.y); yi <= max(v1.y, v2.y); yi++ {
-				can = can && is_green(poss, pos_t{v1.x, yi})
-				can = can && is_green(poss, pos_t{v2.x, yi})
-			}
+			can := give_up(poss, v1, v2)
 			if can {
 				a := area(v1, v2)
 				if a > res {
@@ -163,7 +185,6 @@ func part2(poss []pos_t) int {
 }
 
 func main() {
-	fmt.Println(parser())
 	fmt.Println("Part1:", part1(parser()))
 	fmt.Println("Part2:", part2(parser()))
 }
