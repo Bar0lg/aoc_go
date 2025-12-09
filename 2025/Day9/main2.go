@@ -75,29 +75,38 @@ func what_move(p1 pos_t, p2 pos_t) int {
 }
 
 func give_up(list []pos_t, p1 pos_t, p2 pos_t) bool {
-	lu := pos_t{min(p1.x, p2.x) - 1, min(p1.y, p2.y) - 1}
-	ru := pos_t{min(p1.x, p2.x) - 1, max(p1.y, p2.y) + 1}
-	rd := pos_t{max(p1.x, p2.x) + 1, max(p1.y, p2.y) + 1}
+	fmt.Println("========================================", p1, p2, "==========================")
+	up := min(p1.x, p2.x)
+	down := max(p1.x, p2.x)
+	right := max(p1.y, p2.y)
+	left := min(p1.y, p2.y)
 	for i := range list[:len(list)-1] {
 		p1 := list[i]
 		p2 := list[i+1]
+
+		fmt.Println(p1, p2)
 		if p1.x == p2.x { // Cas vhorizon
-			if p1.x > lu.x && p1.x < rd.x {
-				if p1.y > lu.y && p1.y < ru.y && (p2.y <= lu.y || p2.y >= ru.y) {
+
+			if p1.x > up && p1.x < down {
+
+				if p1.y > left && p1.y < right && (p2.y < left || p2.y > right) {
 					return false
 				}
-				if p2.y > lu.y && p2.y < ru.y && (p1.y <= lu.y || p1.y >= ru.y) {
+
+				if p2.y > left && p2.y < right && (p1.y < left || p1.y > right) {
 					return false
 				}
 			}
 
 		}
-		if p1.y == p2.y { // Cas vertical
-			if p1.y > lu.y && p1.y < ru.y {
-				if p1.x > lu.x && p1.x < rd.x && (p2.x <= lu.x || p2.x >= rd.x) {
+		if p1.y == p2.y { // Cas vhorizon
+
+			if p1.y > left && p1.y < right {
+
+				if p1.x > up && p1.x < down && (p2.x < up || p2.x > down) {
 					return false
 				}
-				if p2.x > lu.x && p2.x < rd.x && (p1.x <= lu.x || p1.x >= rd.x) {
+				if p2.x > up && p2.x < down && (p1.x < up || p1.x > down) {
 					return false
 				}
 			}
@@ -173,6 +182,7 @@ func part2(poss []pos_t) int {
 				continue
 			}
 			can := give_up(poss, v1, v2)
+			fmt.Println(can)
 			if can {
 				a := area(v1, v2)
 				if a > res {
